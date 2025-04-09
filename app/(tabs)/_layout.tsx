@@ -58,7 +58,7 @@ const _Layout = () => {
                     borderRadius: 50,
                     marginHorizontal: 20,
                     marginBottom: 36,
-                    height: 54,
+                    height: 52,
                 },
             }}
         >
