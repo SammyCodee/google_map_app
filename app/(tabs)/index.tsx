@@ -8,8 +8,9 @@ import {
     Keyboard,
     Alert,
     TouchableOpacity,
+    Animated,
 } from "react-native";
-import MapView, { PROVIDER_GOOGLE, Region } from "react-native-maps";
+import MapView, { PROVIDER_GOOGLE, Region, Marker } from "react-native-maps";
 import {
     savedSearchHistory,
     getSearchHistory,
@@ -18,9 +19,14 @@ import Constants from "expo-constants";
 import axios from "axios";
 import { Feather } from "@expo/vector-icons";
 import { debounce } from "lodash";
+import { useNavigation } from "expo-router";
 
 export default function Index() {
+    const navigation = useNavigation();
+
     const mapRef = useRef<MapView>(null);
+
+    const slideAnim = useRef(new Animated.Value(300)).current; // starts offscreen
 
     const [searchLocation, setSearchLocation] = useState<string>("");
     const [searchHistory, setSearchHistory] = useState<string[]>([]);
@@ -58,6 +64,39 @@ export default function Index() {
         }
     }, [isInputFocused]);
 
+    /**
+     * Hide the tab bar when a place is selected
+     */
+    useEffect(() => {
+        navigation.setOptions({
+            tabBarStyle: selectedPlace
+                ? { display: "none" }
+                : {
+                      backgroundColor: "#2D2D44",
+                      overflow: "hidden",
+                      position: "absolute",
+                      borderWidth: 1,
+                      borderColor: "#2D2D44",
+                      borderRadius: 50,
+                      marginHorizontal: 20,
+                      marginBottom: 36,
+                      height: 52,
+                      zIndex: 1,
+                  }, // values here MUST be the same as _layout.tsx from (tabs) folder
+        });
+    }, [selectedPlace]);
+
+    /**
+     * Trigger Slide in/out
+     */
+    useEffect(() => {
+        Animated.timing(slideAnim, {
+            toValue: selectedPlace ? 0 : 300,
+            duration: 300,
+            useNativeDriver: true,
+        }).start();
+    }, [selectedPlace]);
+
     // Update the search history when a new location is searched
     const handleSearchLocation = async (newLocation: string) => {
         if (!newLocation) return;
@@ -89,7 +128,6 @@ export default function Index() {
 
             if (contentType && contentType.includes("application/json")) {
                 const data = JSON.parse(raw);
-                console.log("🚀 ~ searchPlaceAndMoveToLocation ~ data:", data);
 
                 if (
                     data.status === "OK" &&
@@ -215,9 +253,11 @@ export default function Index() {
 
                 {isInputFocused && (
                     <View className="mt-2">
-                        <View className="mb-2">
-                            <Text className="text-white">Recent</Text>
-                        </View>
+                        {searchHistory.length > 0 && (
+                            <View className="mb-2">
+                                <Text className="text-white">Recent</Text>
+                            </View>
+                        )}
 
                         {/* Search History List (show 5)*/}
                         {searchHistory.slice(0, 5).map((item, index) => {
@@ -270,23 +310,6 @@ export default function Index() {
                     </View>
                 )}
 
-                {selectedPlace && (
-                    <View className="absolute top-80 left-4 right-4 bg-secondary p-4 rounded-2xl shadow-lg z-10">
-                        <Text className="text-lg font-bold text-white">
-                            📍 {selectedPlace.name}
-                        </Text>
-                        <Text className="text-white mt-1">
-                            {selectedPlace.address}
-                        </Text>
-                        <TouchableOpacity
-                            className="absolute top-2 right-2"
-                            onPress={() => setSelectedPlace(null)}
-                        >
-                            <Text className="text-white text-xl">✕</Text>
-                        </TouchableOpacity>
-                    </View>
-                )}
-
                 <MapView
                     ref={mapRef}
                     provider={PROVIDER_GOOGLE}
@@ -303,24 +326,56 @@ export default function Index() {
                     scrollEnabled={true}
                     rotateEnabled={true}
                     pitchEnabled={true}
-                />
+                >
+                    <Marker
+                        coordinate={{
+                            latitude: region?.latitude,
+                            longitude: region?.longitude,
+                        }}
+                        pinColor="red" // ← This makes the marker red
+                    />
+                </MapView>
 
-                <View className="absolute right-6 bottom-28 z-10 space-y-3 gap-2">
-                    <Feather
-                        name="plus"
-                        size={24}
-                        color="white"
-                        className="bg-black/70 p-2 rounded-full"
-                        onPress={() => handleZoom(true)}
-                    />
-                    <Feather
-                        name="minus"
-                        size={24}
-                        color="white"
-                        className="bg-black/70 p-2 rounded-full"
-                        onPress={() => handleZoom(false)}
-                    />
-                </View>
+                {selectedPlace && (
+                    <Animated.View
+                        style={{
+                            transform: [{ translateY: slideAnim }],
+                        }}
+                        className="absolute bottom-0 left-0 right-0 bg-secondary p-6 rounded-t-3xl shadow-lg z-10 h-1/5"
+                    >
+                        <Text className="text-lg font-bold text-white">
+                            📍 {selectedPlace?.name}
+                        </Text>
+                        <Text className="text-white mt-1">
+                            {selectedPlace?.address}
+                        </Text>
+                        <TouchableOpacity
+                            className="absolute top-2 right-4"
+                            onPress={() => setSelectedPlace(null)}
+                        >
+                            <Text className="text-white text-xl">✕</Text>
+                        </TouchableOpacity>
+                    </Animated.View>
+                )}
+
+                {!selectedPlace && (
+                    <View className="absolute right-6 bottom-28 z-10 space-y-3 gap-2">
+                        <Feather
+                            name="plus"
+                            size={24}
+                            color="white"
+                            className="bg-black/70 p-2 rounded-full"
+                            onPress={() => handleZoom(true)}
+                        />
+                        <Feather
+                            name="minus"
+                            size={24}
+                            color="white"
+                            className="bg-black/70 p-2 rounded-full"
+                            onPress={() => handleZoom(false)}
+                        />
+                    </View>
+                )}
             </View>
         </SafeAreaView>
     );

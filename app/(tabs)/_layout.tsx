@@ -59,6 +59,7 @@ const _Layout = () => {
                     marginHorizontal: 20,
                     marginBottom: 36,
                     height: 52,
+                    zIndex: 1,
                 },
             }}
         >
