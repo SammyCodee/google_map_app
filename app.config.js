@@ -64,6 +64,7 @@ export default {
     },
     extra: {
       GOOGLE_MAPS_API_KEY: process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY,
+      GOOGLE_MAPS_BASE_URL: process.env.EXPO_PUBLIC_GOOGLE_MAPS_BASE_URL,
       eas: {
         projectId: "6c9cd469-223a-48e5-917a-a66c20db10df"
       }

@@ -26,6 +26,9 @@ export default function Index() {
 
     const mapRef = useRef<MapView>(null);
 
+    const baseUrl = Constants.expoConfig?.extra?.GOOGLE_MAPS_BASE_URL;
+    const apiKey = Constants.expoConfig?.extra?.GOOGLE_MAPS_API_KEY;
+
     const slideAnim = useRef(new Animated.Value(300)).current; // starts offscreen
 
     const [searchLocation, setSearchLocation] = useState<string>("");
@@ -116,8 +119,10 @@ export default function Index() {
      */
     const searchPlaceAndMoveToLocation = async (placeName: string) => {
         try {
-            const apiKey = Constants.expoConfig?.extra?.GOOGLE_MAPS_API_KEY;
-            const apiUrl = `https://maps.googleapis.com/maps/api/geocode/json`;
+            /**
+             * Variables prefixed with EXPO_PUBLIC_ are automatically made available in Constants.expoConfig.extra on the client side.
+             */
+            const apiUrl = `${baseUrl}/geocode/json`;
 
             const response = await axios.get(apiUrl, {
                 params: {
@@ -177,8 +182,7 @@ export default function Index() {
             return;
         }
 
-        const apiKey = Constants.expoConfig?.extra?.GOOGLE_MAPS_API_KEY;
-        const apiUrl = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(
+        const apiUrl = `${baseUrl}/place/autocomplete/json?input=${encodeURIComponent(
             query
         )}&key=${apiKey}`;
 

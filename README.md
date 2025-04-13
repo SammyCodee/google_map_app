@@ -63,6 +63,7 @@ Before you begin, ensure you have:
     - Add your Google Maps API key:
         ```
         EXPO_PUBLIC_GOOGLE_MAPS_API_KEY=your_api_key_here
+        EXPO_PUBLIC_GOOGLE_MAPS_BASE_URL=https://maps.googleapis.com/maps/api
         ```
     - Must use EXPO_PUBLIC_XXXX to be used in the client side for fetching api purpose
 
@@ -70,7 +71,7 @@ Before you begin, ensure you have:
 
     - Choose your project → Configuration → Environment variables
 
-    - Add the variables by selecting "+ Add Variables", input the EXPO_PUBLIC_GOOGLE_MAPS_API_KEY and value
+    - Add the variables by selecting "+ Add Variables", input the EXPO_PUBLIC_GOOGLE_MAPS_API_KEY, EXPO_PUBLIC_GOOGLE_MAPS_BASE_URLand its value
 
 4. Android Development Setup:
 
