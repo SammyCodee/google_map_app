@@ -1,4 +1,12 @@
-import "dotenv/config";
+import 'dotenv/config';
+import os from 'os';
+
+if (typeof os.availableParallelism !== 'function') {
+  os.availableParallelism = () => os.cpus().length;
+}
+
+// Log the API key to verify it's being loaded
+console.log('Google Maps API Key:', process.env.GOOGLE_MAPS_API_KEY);
 
 export default {
   expo: {

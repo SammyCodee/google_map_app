@@ -1,50 +1,109 @@
-# Welcome to your Expo app 👋
+# Location Search App 📍
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A React Native application that integrates Google Maps and Places API for location search functionality with search history features.
 
-## Get started
+## Prerequisites
 
-1. Install dependencies
+Before you begin, ensure you have:
 
-   ```bash
-   npm install
-   ```
+-   Node.js (LTS version)
+-   npm or yarn
+-   Android Studio (for Android development)
+-   Google Maps API key
+-   Expo CLI (`npm install -g expo-cli`)
+-   EAS CLI (`npm install -g eas-cli`)
 
-2. Start the app
+## Setup Instructions
 
-   ```bash
-    npx expo start
-   ```
+1. Clone the repository:
 
-In the output, you'll find options to open the app in a
+    ```bash
+    git clone [your-repo-url]
+    cd [your-repo-name]
+    ```
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+2. Install dependencies:
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+    ```bash
+    npm install
+    ```
 
-## Get a fresh project
+3. Environment Configuration:
 
-When you're ready, run:
+    - Create a `.env` file in the root directory
+    - Add your Google Maps API key:
+        ```
+        GOOGLE_MAPS_API_KEY=your_api_key_here
+        ```
 
-```bash
-npm run reset-project
+4. Android Development Setup:
+
+    ```bash
+    # Login to EAS
+    eas login
+
+    # Create development build
+    eas build --profile development --platform android
+    ```
+
+## Running the App
+
+1. Start the development server:
+
+    ```bash
+    npx expo start --dev-client
+    ```
+
+2. Manually open the app on the emulator:
+
+    If it doesn't auto-connect to Metro:
+
+    Open the browser and paste the URL shown in the terminal (e.g., exp://127.0.0.1:8081)
+
+    Or run this command to send it to the emulator:
+
+    ```bash
+    adb shell input text 'exp://127.0.0.1:8081'
+    ```
+
+    Press Enter in the emulator to launch the app
+
+3. Clear cache if needed:
+    ```bash
+    npx expo start --dev-client --clear
+    ```
+
+## Project Structure
+
+```
+├── app/
+│   ├── (tabs)/          # Tab-based screens
+│   │   ├── index.tsx    # Main map screen
+│   │   └── profile.tsx  # Profile screen
+│   └── _layout.tsx      # Root layout
+├── components/          # Reusable components
+│   └── SearchInput.tsx  # Search input component
+├── utils/              # Utility functions
+└── assets/            # Static assets
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## Tech Stack
 
-## Learn more
+-   React Native with Expo
+-   TypeScript
+-   Google Maps API
+-   Expo Router for navigation
+-   NativeWind (Tailwind CSS) for styling
+-   Expo SecureStore for local storage
+-   EAS Build for development builds
 
-To learn more about developing your project with Expo, look at the following resources:
+## Development Notes
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+-   The app uses file-based routing with Expo Router
+-   Styling is implemented using NativeWind (Tailwind CSS)
+-   Search history is persisted using Expo SecureStore
+-   Map functionality is implemented using react-native-maps
 
-## Join the community
+## License
 
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+[Your License]
