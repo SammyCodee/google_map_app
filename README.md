@@ -85,6 +85,8 @@ Before you begin, ensure you have:
     eas build --profile development --platform android
     ```
 
+    Press "Y" to build on the android emulator
+
 ## Running the App
 
 1. Start the development server:

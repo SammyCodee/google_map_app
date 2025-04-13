@@ -20,6 +20,8 @@ import axios from "axios";
 import { Feather } from "@expo/vector-icons";
 import { debounce } from "lodash";
 import { useNavigation } from "expo-router";
+import { GetGeoCode } from "@/api/GetGeoCode";
+import { GetPlaceSuggestions } from "@/api/GetPlaceSuggestions";
 
 export default function Index() {
     const navigation = useNavigation();
@@ -122,16 +124,7 @@ export default function Index() {
             /**
              * Variables prefixed with EXPO_PUBLIC_ are automatically made available in Constants.expoConfig.extra on the client side.
              */
-            const apiUrl = `${baseUrl}/geocode/json`;
-
-            const response = await axios.get(apiUrl, {
-                params: {
-                    address: placeName,
-                    key: apiKey,
-                },
-            });
-
-            const data = response.data;
+            const data = await GetGeoCode(placeName);
 
             if (data.status === "OK" && data.results?.length > 0) {
                 const { lat, lng } = data.results[0].geometry.location;
@@ -177,30 +170,9 @@ export default function Index() {
 
     // Debounced input handler for real-time suggestions
     const handleInputChange = debounce(async (query: string) => {
-        if (query.length < 3) {
-            setSuggestions([]);
-            return;
-        }
-
-        const apiUrl = `${baseUrl}/place/autocomplete/json?input=${encodeURIComponent(
-            query
-        )}&key=${apiKey}`;
-
-        try {
-            const response = await axios.get(apiUrl);
-            const data = response.data;
-
-            if (data.status === "OK" && data.predictions) {
-                setSuggestions(
-                    data.predictions.map(
-                        (prediction: any) => prediction.description
-                    )
-                );
-            }
-        } catch (error) {
-            console.error("Suggestions error:", error);
-        }
-    }, 500); // 500ms debounce
+        const suggestions = await GetPlaceSuggestions(query);
+        setSuggestions(suggestions);
+    }, 500);
 
     return (
         <SafeAreaView style={{ flex: 1 }} className="bg-primary">
