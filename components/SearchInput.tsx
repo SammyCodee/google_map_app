@@ -5,6 +5,7 @@ interface SearchInputProps {
     setSearchLocation: (value: string) => void;
     onSearch: (location: string) => void;
     onInputChange?: (value: string) => void;
+    onFocusChange?: (isFocused: boolean) => void;
 }
 
 export default function SearchInput({
@@ -12,6 +13,7 @@ export default function SearchInput({
     setSearchLocation,
     onSearch,
     onInputChange,
+    onFocusChange,
 }: SearchInputProps) {
     const handleTextChange = (text: string) => {
         setSearchLocation(text);
@@ -38,6 +40,10 @@ export default function SearchInput({
                 onChangeText={handleTextChange}
                 onSubmitEditing={handleSubmit} // Handle submit event (Enter key or search button)
                 returnKeyType="search"
+                onFocus={() => {
+                    onFocusChange?.(true);
+                }}
+                onBlur={() => onFocusChange?.(false)}
             />
             <TouchableOpacity onPress={handleSubmit}>
                 <Feather name="arrow-right-circle" size={24} color="#aaa" />

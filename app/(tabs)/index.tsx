@@ -7,6 +7,7 @@ import {
     StyleSheet,
     Keyboard,
     Alert,
+    TouchableOpacity,
 } from "react-native";
 import MapView, { PROVIDER_GOOGLE, Region } from "react-native-maps";
 import {
@@ -23,7 +24,11 @@ export default function Index() {
 
     const [searchLocation, setSearchLocation] = useState<string>("");
     const [searchHistory, setSearchHistory] = useState<string[]>([]);
-    // console.log("🚀 ~ Index ~ searchHistory:", searchHistory);
+    const [isInputFocused, setIsInputFocused] = useState(false);
+    const [selectedPlace, setSelectedPlace] = useState<{
+        name: string;
+        address: string;
+    } | null>(null);
 
     /**
      * Initial region for the map is San Francisco
@@ -47,6 +52,12 @@ export default function Index() {
         loadHistory();
     }, []);
 
+    useEffect(() => {
+        if (isInputFocused) {
+            setSelectedPlace(null);
+        }
+    }, [isInputFocused]);
+
     // Update the search history when a new location is searched
     const handleSearchLocation = async (newLocation: string) => {
         if (!newLocation) return;
@@ -58,6 +69,7 @@ export default function Index() {
         const updatedHistory = [newLocation, ...searchHistory];
         setSearchHistory(updatedHistory);
         await savedSearchHistory(updatedHistory);
+        setSuggestions([]);
     };
 
     /**
@@ -85,6 +97,10 @@ export default function Index() {
                     data.results.length > 0
                 ) {
                     const { lat, lng } = data.results[0].geometry.location;
+                    const address = data.results[0].formatted_address;
+                    const name =
+                        data.results[0].address_components?.[0]?.long_name ??
+                        placeName;
 
                     const newRegion = {
                         latitude: lat,
@@ -94,6 +110,7 @@ export default function Index() {
                     };
 
                     setRegion(newRegion);
+                    setSelectedPlace({ name, address });
 
                     mapRef.current?.animateToRegion(newRegion, 1000);
                 } else {
@@ -173,11 +190,17 @@ export default function Index() {
                         setSearchLocation(text); // update value immediately
                         handleInputChange(text);
                     }}
+                    onFocusChange={setIsInputFocused}
                 />
+
+                {!isInputFocused && <View className="mt-2 mb-2" />}
 
                 {/* Display real-time search suggestions */}
                 {suggestions.length > 0 && (
                     <View className="mt-2">
+                        <View className="mb-2">
+                            <Text className="text-white">Suggestions</Text>
+                        </View>
                         {suggestions.map((suggestion, index) => (
                             <Text
                                 key={index}
@@ -190,60 +213,85 @@ export default function Index() {
                     </View>
                 )}
 
-                <View className="mt-2">
-                    {/* Search History List (show 5)*/}
-                    {searchHistory.slice(0, 5).map((item, index) => {
-                        return (
-                            <View
-                                key={index}
-                                className="flex-row items-center justify-between bg-white rounded-md mb-2 px-4 py-2"
-                            >
-                                <Text
-                                    key={index}
-                                    className="py-2 px-4 bg-white rounded-md mb-2 text-black"
-                                    onPress={() => {
-                                        setSearchLocation(item);
-                                        handleSearchLocation(item);
-                                    }}
-                                >
-                                    {item}
-                                </Text>
-
-                                <Feather
-                                    name="x"
-                                    size={20}
-                                    color="black"
-                                    onPress={() => {
-                                        const updated = searchHistory.filter(
-                                            (h, i) => i !== index
-                                        );
-                                        setSearchHistory(updated);
-                                        savedSearchHistory(updated);
-                                    }}
-                                />
-                            </View>
-                        );
-                    })}
-                    {/* Clear History Button */}
-                    {searchHistory.length > 0 && (
-                        <View className="mt-2 mb-4">
-                            <Text
-                                onPress={() => {
-                                    setSearchHistory([]);
-                                    savedSearchHistory([]);
-                                }}
-                                className="text-red-500 text-center"
-                            >
-                                Clear History
-                            </Text>
+                {isInputFocused && (
+                    <View className="mt-2">
+                        <View className="mb-2">
+                            <Text className="text-white">Recent</Text>
                         </View>
-                    )}
-                </View>
+
+                        {/* Search History List (show 5)*/}
+                        {searchHistory.slice(0, 5).map((item, index) => {
+                            return (
+                                <View
+                                    key={index}
+                                    className="flex-row items-center justify-between bg-white rounded-md mb-2 px-4 py-2"
+                                >
+                                    <Text
+                                        key={index}
+                                        className="py-2 px-4 bg-white rounded-md mb-2 text-black"
+                                        onPress={() => {
+                                            setSearchLocation(item);
+                                            handleSearchLocation(item);
+                                        }}
+                                    >
+                                        {item}
+                                    </Text>
+
+                                    <Feather
+                                        name="x"
+                                        size={20}
+                                        color="black"
+                                        onPress={() => {
+                                            const updated =
+                                                searchHistory.filter(
+                                                    (h, i) => i !== index
+                                                );
+                                            setSearchHistory(updated);
+                                            savedSearchHistory(updated);
+                                        }}
+                                    />
+                                </View>
+                            );
+                        })}
+                        {/* Clear History Button */}
+                        {searchHistory.length > 0 && (
+                            <View className="mt-2 mb-4">
+                                <Text
+                                    onPress={() => {
+                                        setSearchHistory([]);
+                                        savedSearchHistory([]);
+                                    }}
+                                    className="text-red-500 text-center"
+                                >
+                                    Clear History
+                                </Text>
+                            </View>
+                        )}
+                    </View>
+                )}
+
+                {selectedPlace && (
+                    <View className="absolute top-80 left-4 right-4 bg-secondary p-4 rounded-2xl shadow-lg z-10">
+                        <Text className="text-lg font-bold text-white">
+                            📍 {selectedPlace.name}
+                        </Text>
+                        <Text className="text-white mt-1">
+                            {selectedPlace.address}
+                        </Text>
+                        <TouchableOpacity
+                            className="absolute top-2 right-2"
+                            onPress={() => setSelectedPlace(null)}
+                        >
+                            <Text className="text-white text-xl">✕</Text>
+                        </TouchableOpacity>
+                    </View>
+                )}
+
                 <MapView
                     ref={mapRef}
                     provider={PROVIDER_GOOGLE}
                     style={styles.map}
-                    className="flex-1 w-full pb-10 pt-4"
+                    className="flex-1 w-full"
                     initialRegion={{
                         latitude: 37.78825,
                         longitude: -122.4324,
