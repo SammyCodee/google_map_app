@@ -199,7 +199,7 @@ export default function Index() {
         try {
             const response = await axios.get(apiUrl);
             const data = response.data;
-            console.log("🚀 ~ handleInputChange ~ data:", data);
+
             if (data.status === "OK" && data.predictions) {
                 setSuggestions(
                     data.predictions.map(
@@ -382,10 +382,6 @@ export default function Index() {
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        padding: 16,
-    },
     map: {
         flex: 1,
         width: "100%",
