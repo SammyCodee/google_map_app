@@ -117,59 +117,45 @@ export default function Index() {
     const searchPlaceAndMoveToLocation = async (placeName: string) => {
         try {
             const apiKey = Constants.expoConfig?.extra?.GOOGLE_MAPS_API_KEY;
-            const apiUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
-                placeName
-            )}&key=${apiKey}`;
+            const apiUrl = `https://maps.googleapis.com/maps/api/geocode/json`;
 
-            const response = await fetch(apiUrl);
+            const response = await axios.get(apiUrl, {
+                params: {
+                    address: placeName,
+                    key: apiKey,
+                },
+            });
 
-            const contentType = response.headers.get("content-type");
-            const raw = await response.text();
+            const data = response.data;
 
-            if (contentType && contentType.includes("application/json")) {
-                const data = JSON.parse(raw);
+            if (data.status === "OK" && data.results?.length > 0) {
+                const { lat, lng } = data.results[0].geometry.location;
+                const address = data.results[0].formatted_address;
+                const name =
+                    data.results[0].address_components?.[0]?.long_name ??
+                    placeName;
 
-                if (
-                    data.status === "OK" &&
-                    data.results &&
-                    data.results.length > 0
-                ) {
-                    const { lat, lng } = data.results[0].geometry.location;
-                    const address = data.results[0].formatted_address;
-                    const name =
-                        data.results[0].address_components?.[0]?.long_name ??
-                        placeName;
+                const newRegion = {
+                    latitude: lat,
+                    longitude: lng,
+                    latitudeDelta: 0.01,
+                    longitudeDelta: 0.01,
+                };
 
-                    const newRegion = {
-                        latitude: lat,
-                        longitude: lng,
-                        latitudeDelta: 0.01,
-                        longitudeDelta: 0.01,
-                    };
+                setRegion(newRegion);
+                setSelectedPlace({ name, address });
 
-                    setRegion(newRegion);
-                    setSelectedPlace({ name, address });
-
-                    mapRef.current?.animateToRegion(newRegion, 1000);
-                } else {
-                    console.warn("❌ No results found:", data.status);
-                    Alert.alert(
-                        "Location Not Found",
-                        data.error_message || data.status
-                    );
-                }
+                mapRef.current?.animateToRegion(newRegion, 1000);
             } else {
-                console.error(
-                    "❌ Response not JSON. Content-Type:",
-                    contentType
-                );
+                console.warn("❌ No results found:", data.status);
                 Alert.alert(
-                    "Error",
-                    "The server returned an unexpected response."
+                    "Location Not Found",
+                    data.error_message || data.status
                 );
             }
-        } catch (error) {
-            console.error("🔥 Search error:", error);
+        } catch (error: any) {
+            console.error("❌ Search error:", error);
+            Alert.alert("Error", error.message || "Failed to search location.");
         }
     };
 
