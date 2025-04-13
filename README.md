@@ -33,8 +33,13 @@ Before you begin, ensure you have:
     - Create a `.env` file in the root directory
     - Add your Google Maps API key:
         ```
-        GOOGLE_MAPS_API_KEY=your_api_key_here
+        EXPO_PUBLIC_GOOGLE_MAPS_API_KEY=your_api_key_here
         ```
+    - Must use EXPO_PUBLIC_XXXX to be used in the client side for fetching api purpose
+
+    - Go to https://expo.dev/accounts and select Configuration -> Environment variables
+
+    - Add the variables by selecting "+ Add Variables", input the EXPO_PUBLIC_GOOGLE_MAPS_API_KEY and value
 
 4. Android Development Setup:
 
@@ -58,15 +63,13 @@ Before you begin, ensure you have:
 
     If it doesn't auto-connect to Metro:
 
-    Open the browser and paste the URL shown in the terminal (e.g., exp://127.0.0.1:8081)
+    Copy the Metro URL shown in terminal (e.g. exp://192.168.0.x:8081)
 
-    Or run this command to send it to the emulator:
+    Open the Expo Go or custom dev client app on your emulator
 
-    ```bash
-    adb shell input text 'exp://127.0.0.1:8081'
-    ```
+    Tap "Enter URL manually" and paste it in
 
-    Press Enter in the emulator to launch the app
+    ⚠️ Note: This is required because npx expo start with "a" shortcut won’t work with dev client builds.
 
 3. Clear cache if needed:
     ```bash

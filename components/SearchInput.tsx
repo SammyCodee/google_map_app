@@ -4,15 +4,20 @@ interface SearchInputProps {
     searchLocation: string;
     setSearchLocation: (value: string) => void;
     onSearch: (location: string) => void;
+    onInputChange?: (value: string) => void;
 }
 
 export default function SearchInput({
     searchLocation,
     setSearchLocation,
     onSearch,
+    onInputChange,
 }: SearchInputProps) {
     const handleTextChange = (text: string) => {
         setSearchLocation(text);
+        if (onInputChange) {
+            onInputChange(text); // Fire real-time suggestion handler
+        }
     };
 
     const handleSubmit = () => {

@@ -5,8 +5,8 @@ if (typeof os.availableParallelism !== 'function') {
   os.availableParallelism = () => os.cpus().length;
 }
 
-// Log the API key to verify it's being loaded
-console.log('Google Maps API Key:', process.env.GOOGLE_MAPS_API_KEY);
+// ✅ Use process.env here instead of Constants
+console.log("✅ Loaded API Key:", process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY);
 
 export default {
   expo: {
@@ -22,7 +22,7 @@ export default {
       supportsTablet: true,
       bundleIdentifier: "com.sam.googlemapapp", // 👈 required
       config: {
-        googleMapsApiKey: process.env.GOOGLE_MAPS_API_KEY,
+        googleMapsApiKey: process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY,
       },
       infoPlist: {
         NSLocationWhenInUseUsageDescription: "We need access to your location to show your position on the map",
@@ -37,7 +37,7 @@ export default {
       },
       config: {
         googleMaps: {
-          apiKey: process.env.GOOGLE_MAPS_API_KEY, // 👈 required
+          apiKey: process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY, // 👈 required
         },
       },
       "permissions": ["ACCESS_FINE_LOCATION", "ACCESS_COARSE_LOCATION"]
@@ -63,6 +63,7 @@ export default {
       typedRoutes: true,
     },
     extra: {
+      GOOGLE_MAPS_API_KEY: process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY,
       eas: {
         projectId: "6c9cd469-223a-48e5-917a-a66c20db10df"
       }
